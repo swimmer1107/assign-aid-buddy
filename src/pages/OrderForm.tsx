@@ -1,15 +1,17 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BookOpen, Upload, Calculator } from "lucide-react";
-import { Link } from "react-router-dom";
+import { BookOpen, Upload, Calculator, LogOut } from "lucide-react";
+import { Link, Navigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
-const OrderForm = () => {
+const OrderFormContent = () => {
   const [formData, setFormData] = useState({
     subject: "",
     grade: "",
@@ -24,7 +26,9 @@ const OrderForm = () => {
   const [estimatedPrice, setEstimatedPrice] = useState(0);
   const [estimatedTime, setEstimatedTime] = useState("");
   const [files, setFiles] = useState<FileList | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const { user, signOut } = useAuth();
 
   const calculateEstimate = () => {
     const pages = parseInt(formData.pages) || 1;
@@ -58,11 +62,111 @@ const OrderForm = () => {
     setFiles(e.target.files);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please log in to submit an order.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // Insert order into database
+      const { data: order, error: orderError } = await supabase
+        .from('orders')
+        .insert({
+          user_id: user.id,
+          subject: formData.subject,
+          grade: formData.grade,
+          assignment_type: formData.assignmentType,
+          title: formData.title,
+          description: formData.description,
+          pages: parseInt(formData.pages),
+          deadline: formData.deadline,
+          design_preference: formData.designPreference,
+          special_instructions: formData.specialInstructions,
+          estimated_price: estimatedPrice,
+          estimated_time: estimatedTime,
+        })
+        .select()
+        .single();
+
+      if (orderError) {
+        throw orderError;
+      }
+
+      // Handle file uploads if any
+      if (files && files.length > 0 && order) {
+        for (let i = 0; i < files.length; i++) {
+          const file = files[i];
+          const fileName = `${user.id}/${order.id}/${file.name}`;
+          
+          // Upload file to storage
+          const { error: uploadError } = await supabase.storage
+            .from('order-files')
+            .upload(fileName, file);
+
+          if (uploadError) {
+            console.error('File upload error:', uploadError);
+          } else {
+            // Save file reference in database
+            await supabase
+              .from('order_files')
+              .insert({
+                order_id: order.id,
+                file_name: file.name,
+                file_path: fileName,
+                file_size: file.size,
+                file_type: file.type,
+              });
+          }
+        }
+      }
+
+      toast({
+        title: "Order Submitted Successfully!",
+        description: "We'll contact you shortly with payment details and start working on your assignment!",
+      });
+
+      // Reset form
+      setFormData({
+        subject: "",
+        grade: "",
+        assignmentType: "",
+        title: "",
+        description: "",
+        pages: "",
+        deadline: "",
+        designPreference: "",
+        specialInstructions: ""
+      });
+      setFiles(null);
+      setEstimatedPrice(0);
+      setEstimatedTime("");
+
+    } catch (error: any) {
+      console.error('Submission error:', error);
+      toast({
+        title: "Submission Failed",
+        description: error.message || "There was an error submitting your order. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
     toast({
-      title: "Order Submitted",
-      description: "We'll contact you shortly with payment details and start working on your assignment!",
+      title: "Signed Out",
+      description: "You have been successfully signed out.",
     });
   };
 
@@ -76,9 +180,15 @@ const OrderForm = () => {
               <BookOpen className="h-8 w-8 text-blue-600 mr-2" />
               <h1 className="text-2xl font-bold text-gray-900">AssignAid</h1>
             </Link>
-            <Link to="/">
-              <Button variant="outline">Back to Home</Button>
-            </Link>
+            <div className="flex items-center space-x-4">
+              <span className="text-sm text-gray-600">
+                Welcome, {user?.user_metadata?.first_name || user?.email}
+              </span>
+              <Button variant="outline" onClick={handleSignOut}>
+                <LogOut className="h-4 w-4 mr-2" />
+                Sign Out
+              </Button>
+            </div>
           </div>
         </div>
       </header>
@@ -269,8 +379,8 @@ const OrderForm = () => {
                     />
                   </div>
 
-                  <Button type="submit" className="w-full">
-                    Submit Order Request
+                  <Button type="submit" className="w-full" disabled={isSubmitting}>
+                    {isSubmitting ? "Submitting Order..." : "Submit Order Request"}
                   </Button>
                 </form>
               </CardContent>
@@ -329,6 +439,14 @@ const OrderForm = () => {
         </div>
       </div>
     </div>
+  );
+};
+
+const OrderForm = () => {
+  return (
+    <ProtectedRoute>
+      <OrderFormContent />
+    </ProtectedRoute>
   );
 };
 
