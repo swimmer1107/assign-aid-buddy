@@ -4,14 +4,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BookOpen, Upload, Calculator, LogOut, CreditCard } from "lucide-react";
+import { BookOpen, Upload, Calculator, LogOut } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import PaymentGateway from "@/components/PaymentGateway";
 
 interface SelectedPlan {
+  id: string;
   name: string;
   pricePerPage: number;
   urgencyMultiplier: number;
@@ -50,12 +52,27 @@ const OrderFormContent = () => {
   const calculateEstimate = () => {
     const pages = parseInt(formData.pages) || 1;
     const basePrice = selectedPlan?.pricePerPage || 50;
-    const urgencyMultiplier = selectedPlan?.urgencyMultiplier || getDaysUntilDeadline() <= 1 ? 2 : getDaysUntilDeadline() <= 3 ? 1.5 : 1;
     
+    // Calculate urgency multiplier based on deadline
+    let urgencyMultiplier = 1;
+    if (formData.deadline) {
+      const daysUntilDeadline = getDaysUntilDeadline();
+      if (daysUntilDeadline <= 1) {
+        urgencyMultiplier = 2;
+      } else if (daysUntilDeadline <= 3) {
+        urgencyMultiplier = 1.5;
+      } else {
+        urgencyMultiplier = selectedPlan?.urgencyMultiplier || 1;
+      }
+    } else {
+      urgencyMultiplier = selectedPlan?.urgencyMultiplier || 1;
+    }
+    
+    // Fix: Simple calculation without double multiplication
     const price = pages * basePrice * urgencyMultiplier;
     const timeInDays = selectedPlan?.deliveryTime || `${Math.max(1, Math.ceil(pages * 0.5))} day${Math.ceil(pages * 0.5) > 1 ? 's' : ''}`;
     
-    setEstimatedPrice(price);
+    setEstimatedPrice(Math.round(price));
     setEstimatedTime(timeInDays);
   };
 
@@ -81,10 +98,11 @@ const OrderFormContent = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    calculateEstimate(); // Ensure latest calculation
     setShowPaymentGateway(true);
   };
 
-  const handlePayment = async () => {
+  const handlePayment = async (paymentData: any) => {
     if (!user) {
       toast({
         title: "Authentication Required",
@@ -116,6 +134,10 @@ const OrderFormContent = () => {
           special_instructions: formData.specialInstructions,
           estimated_price: estimatedPrice,
           estimated_time: estimatedTime,
+          payment_method_id: paymentData.paymentMethodId,
+          payment_status: 'completed',
+          transaction_id: paymentData.transactionId,
+          payment_amount: paymentData.amount,
         })
         .select()
         .single();
@@ -232,71 +254,14 @@ const OrderFormContent = () => {
 
         {/* Payment Gateway Modal */}
         {showPaymentGateway && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <Card className="w-full max-w-md">
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <CreditCard className="h-5 w-5 mr-2" />
-                  Payment Gateway
-                </CardTitle>
-                <CardDescription>Complete your payment to submit the order</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-3 p-4 bg-gray-50 rounded-lg">
-                  <div className="flex justify-between">
-                    <span className="font-medium">Plan:</span>
-                    <span>{selectedPlan?.name || 'Standard'}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="font-medium">Pages:</span>
-                    <span>{formData.pages}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="font-medium">Total Amount:</span>
-                    <span className="font-bold text-blue-600">₹{estimatedPrice}</span>
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="cardNumber">Card Number</Label>
-                  <Input id="cardNumber" placeholder="1234 5678 9012 3456" />
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="expiry">Expiry</Label>
-                    <Input id="expiry" placeholder="MM/YY" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="cvv">CVV</Label>
-                    <Input id="cvv" placeholder="123" />
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="cardName">Name on Card</Label>
-                  <Input id="cardName" placeholder="John Doe" />
-                </div>
-                
-                <div className="flex space-x-2">
-                  <Button 
-                    onClick={handlePayment} 
-                    className="flex-1" 
-                    disabled={isSubmitting}
-                  >
-                    {isSubmitting ? 'Processing...' : `Pay ₹${estimatedPrice}`}
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    onClick={() => setShowPaymentGateway(false)}
-                    disabled={isSubmitting}
-                  >
-                    Cancel
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+          <PaymentGateway
+            totalAmount={estimatedPrice}
+            onPaymentSuccess={handlePayment}
+            onCancel={() => setShowPaymentGateway(false)}
+            selectedPlan={selectedPlan}
+            formData={formData}
+            isSubmitting={isSubmitting}
+          />
         )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

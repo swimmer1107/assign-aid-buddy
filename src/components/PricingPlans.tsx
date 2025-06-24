@@ -103,6 +103,7 @@ const PricingPlans = () => {
       navigate('/order', { 
         state: { 
           selectedPlan: {
+            id: plan.id,
             name: plan.name,
             pricePerPage: plan.pricePerPage,
             urgencyMultiplier: plan.urgencyMultiplier,
