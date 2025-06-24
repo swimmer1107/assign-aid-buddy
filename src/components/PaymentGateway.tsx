@@ -78,7 +78,7 @@ const PaymentGateway = ({
   const selectedMethodData = paymentMethods.find(m => m.id === selectedPaymentMethod);
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <Card className="w-full max-w-md max-h-[90vh] overflow-y-auto">
         <CardHeader>
           <CardTitle className="flex items-center">
@@ -104,14 +104,20 @@ const PaymentGateway = ({
           </div>
 
           <div className="space-y-3">
-            <Label>Select Payment Method</Label>
-            <RadioGroup value={selectedPaymentMethod} onValueChange={setSelectedPaymentMethod}>
+            <Label className="text-base font-semibold">Select Payment Method</Label>
+            <RadioGroup 
+              value={selectedPaymentMethod} 
+              onValueChange={setSelectedPaymentMethod}
+              className="space-y-2"
+            >
               {paymentMethods.map((method) => (
-                <div key={method.id} className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50">
+                <div key={method.id} className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
                   <RadioGroupItem value={method.id} id={method.id} />
-                  <Label htmlFor={method.id} className="flex items-center space-x-2 cursor-pointer flex-1">
-                    {getPaymentMethodIcon(method.method_type)}
-                    <span>{method.method_name}</span>
+                  <Label htmlFor={method.id} className="flex items-center space-x-3 cursor-pointer flex-1">
+                    <div className="text-blue-600">
+                      {getPaymentMethodIcon(method.method_type)}
+                    </div>
+                    <span className="font-medium">{method.method_name}</span>
                   </Label>
                 </div>
               ))}
@@ -119,7 +125,8 @@ const PaymentGateway = ({
           </div>
 
           {selectedMethodData?.method_type === 'card' && (
-            <div className="space-y-3">
+            <div className="space-y-3 p-4 bg-blue-50 rounded-lg">
+              <h4 className="font-semibold text-blue-800">Card Details</h4>
               <div className="space-y-2">
                 <Label htmlFor="cardNumber">Card Number</Label>
                 <Input 
@@ -164,11 +171,12 @@ const PaymentGateway = ({
           )}
 
           {selectedMethodData?.method_type === 'qr' && (
-            <div className="space-y-3 text-center">
-              <div className="bg-white p-4 rounded-lg border-2 border-dashed border-gray-300">
-                <QrCode className="h-32 w-32 mx-auto text-gray-400 mb-2" />
+            <div className="space-y-3 text-center p-4 bg-green-50 rounded-lg">
+              <h4 className="font-semibold text-green-800">Scan QR Code</h4>
+              <div className="bg-white p-6 rounded-lg border-2 border-dashed border-green-300">
+                <QrCode className="h-32 w-32 mx-auto text-green-600 mb-2" />
                 <p className="text-sm text-gray-600">Scan QR code with your UPI app</p>
-                <p className="text-xs text-gray-500 mt-1">Amount: ₹{totalAmount}</p>
+                <p className="text-lg font-bold text-green-700 mt-2">Amount: ₹{totalAmount}</p>
               </div>
               <p className="text-sm text-gray-600">
                 Scan the QR code above with any UPI app like Google Pay, PhonePe, or Paytm
@@ -177,11 +185,12 @@ const PaymentGateway = ({
           )}
 
           {selectedMethodData?.method_type === 'upi' && selectedMethodData?.method_name !== 'UPI QR Code' && (
-            <div className="space-y-3 text-center">
-              <div className="bg-blue-50 p-4 rounded-lg">
+            <div className="space-y-3 text-center p-4 bg-blue-50 rounded-lg">
+              <h4 className="font-semibold text-blue-800">Pay with {selectedMethodData.method_name}</h4>
+              <div className="bg-white p-6 rounded-lg border-2 border-blue-200">
                 <Smartphone className="h-16 w-16 mx-auto text-blue-600 mb-2" />
-                <p className="font-medium">Pay with {selectedMethodData.method_name}</p>
-                <p className="text-sm text-gray-600 mt-1">Amount: ₹{totalAmount}</p>
+                <p className="font-medium text-lg">Pay with {selectedMethodData.method_name}</p>
+                <p className="text-2xl font-bold text-blue-700 mt-2">₹{totalAmount}</p>
               </div>
               <p className="text-sm text-gray-600">
                 You will be redirected to {selectedMethodData.method_name} to complete the payment
@@ -189,13 +198,20 @@ const PaymentGateway = ({
             </div>
           )}
 
-          <div className="flex space-x-2">
+          <div className="flex space-x-2 pt-4">
             <Button 
               onClick={handlePayment} 
-              className="flex-1" 
+              className="flex-1 bg-green-600 hover:bg-green-700" 
               disabled={isSubmitting}
             >
-              {isSubmitting ? 'Processing...' : `Pay ₹${totalAmount}`}
+              {isSubmitting ? (
+                <div className="flex items-center">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  Processing...
+                </div>
+              ) : (
+                `Pay ₹${totalAmount}`
+              )}
             </Button>
             <Button 
               variant="outline" 

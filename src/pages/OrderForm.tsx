@@ -53,7 +53,7 @@ const OrderFormContent = () => {
     const pages = parseInt(formData.pages) || 1;
     const basePrice = selectedPlan?.pricePerPage || 50;
     
-    // Calculate urgency multiplier based on deadline
+    // Calculate urgency multiplier based on deadline only
     let urgencyMultiplier = 1;
     if (formData.deadline) {
       const daysUntilDeadline = getDaysUntilDeadline();
@@ -61,14 +61,11 @@ const OrderFormContent = () => {
         urgencyMultiplier = 2;
       } else if (daysUntilDeadline <= 3) {
         urgencyMultiplier = 1.5;
-      } else {
-        urgencyMultiplier = 1; // Normal pricing for more than 3 days
       }
-    } else {
-      urgencyMultiplier = 1; // Default to normal pricing
+      // For more than 3 days, keep multiplier at 1 (no additional charge)
     }
     
-    // Simple calculation: pages * basePrice * urgencyMultiplier
+    // Fixed calculation: pages * basePrice * urgencyMultiplier
     const price = pages * basePrice * urgencyMultiplier;
     const timeInDays = selectedPlan?.deliveryTime || `${Math.max(1, Math.ceil(pages * 0.5))} day${Math.ceil(pages * 0.5) > 1 ? 's' : ''}`;
     
