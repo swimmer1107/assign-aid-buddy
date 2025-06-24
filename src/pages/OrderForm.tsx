@@ -1,17 +1,27 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BookOpen, Upload, Calculator, LogOut } from "lucide-react";
-import { Link, Navigate } from "react-router-dom";
+import { BookOpen, Upload, Calculator, LogOut, CreditCard } from "lucide-react";
+import { Link, useLocation } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import ProtectedRoute from "@/components/ProtectedRoute";
 
+interface SelectedPlan {
+  name: string;
+  pricePerPage: number;
+  urgencyMultiplier: number;
+  deliveryTime: string;
+}
+
 const OrderFormContent = () => {
+  const location = useLocation();
+  const selectedPlan = location.state?.selectedPlan as SelectedPlan;
+  
   const [formData, setFormData] = useState({
     subject: "",
     grade: "",
@@ -27,19 +37,26 @@ const OrderFormContent = () => {
   const [estimatedTime, setEstimatedTime] = useState("");
   const [files, setFiles] = useState<FileList | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPaymentGateway, setShowPaymentGateway] = useState(false);
   const { toast } = useToast();
   const { user, signOut } = useAuth();
 
+  useEffect(() => {
+    if (selectedPlan && formData.pages) {
+      calculateEstimate();
+    }
+  }, [selectedPlan, formData.pages, formData.deadline]);
+
   const calculateEstimate = () => {
     const pages = parseInt(formData.pages) || 1;
-    const basePrice = 50; // Base price per page
-    const urgencyMultiplier = getDaysUntilDeadline() <= 1 ? 2 : getDaysUntilDeadline() <= 3 ? 1.5 : 1;
+    const basePrice = selectedPlan?.pricePerPage || 50;
+    const urgencyMultiplier = selectedPlan?.urgencyMultiplier || getDaysUntilDeadline() <= 1 ? 2 : getDaysUntilDeadline() <= 3 ? 1.5 : 1;
     
     const price = pages * basePrice * urgencyMultiplier;
-    const timeInDays = Math.max(1, Math.ceil(pages * 0.5));
+    const timeInDays = selectedPlan?.deliveryTime || `${Math.max(1, Math.ceil(pages * 0.5))} day${Math.ceil(pages * 0.5) > 1 ? 's' : ''}`;
     
     setEstimatedPrice(price);
-    setEstimatedTime(`${timeInDays} day${timeInDays > 1 ? 's' : ''}`);
+    setEstimatedTime(timeInDays);
   };
 
   const getDaysUntilDeadline = () => {
@@ -64,7 +81,10 @@ const OrderFormContent = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+    setShowPaymentGateway(true);
+  };
+
+  const handlePayment = async () => {
     if (!user) {
       toast({
         title: "Authentication Required",
@@ -77,6 +97,9 @@ const OrderFormContent = () => {
     setIsSubmitting(true);
 
     try {
+      // Simulate payment processing
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      
       // Insert order into database
       const { data: order, error: orderError } = await supabase
         .from('orders')
@@ -130,8 +153,8 @@ const OrderFormContent = () => {
       }
 
       toast({
-        title: "Order Submitted Successfully!",
-        description: "We'll contact you shortly with payment details and start working on your assignment!",
+        title: "Payment Successful!",
+        description: "Your order has been submitted and payment processed. We'll start working on your assignment!",
       });
 
       // Reset form
@@ -149,12 +172,13 @@ const OrderFormContent = () => {
       setFiles(null);
       setEstimatedPrice(0);
       setEstimatedTime("");
+      setShowPaymentGateway(false);
 
     } catch (error: any) {
-      console.error('Submission error:', error);
+      console.error('Payment error:', error);
       toast({
-        title: "Submission Failed",
-        description: error.message || "There was an error submitting your order. Please try again.",
+        title: "Payment Failed",
+        description: error.message || "There was an error processing your payment. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -178,7 +202,7 @@ const OrderFormContent = () => {
           <div className="flex justify-between items-center py-6">
             <Link to="/" className="flex items-center">
               <BookOpen className="h-8 w-8 text-blue-600 mr-2" />
-              <h1 className="text-2xl font-bold text-gray-900">AssignAid</h1>
+              <h1 className="text-2xl font-bold text-gray-900">AssignEase</h1>
             </Link>
             <div className="flex items-center space-x-4">
               <span className="text-sm text-gray-600">
@@ -197,7 +221,83 @@ const OrderFormContent = () => {
         <div className="text-center mb-8">
           <h2 className="text-3xl font-bold text-gray-900 mb-4">Order Assignment Help</h2>
           <p className="text-xl text-gray-600">Tell us about your assignment and we'll provide you with a custom quote</p>
+          {selectedPlan && (
+            <div className="mt-4 p-4 bg-blue-50 rounded-lg">
+              <p className="text-lg font-semibold text-blue-800">
+                Selected Plan: {selectedPlan.name} (₹{selectedPlan.pricePerPage}/page)
+              </p>
+            </div>
+          )}
         </div>
+
+        {/* Payment Gateway Modal */}
+        {showPaymentGateway && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <Card className="w-full max-w-md">
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <CreditCard className="h-5 w-5 mr-2" />
+                  Payment Gateway
+                </CardTitle>
+                <CardDescription>Complete your payment to submit the order</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-3 p-4 bg-gray-50 rounded-lg">
+                  <div className="flex justify-between">
+                    <span className="font-medium">Plan:</span>
+                    <span>{selectedPlan?.name || 'Standard'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="font-medium">Pages:</span>
+                    <span>{formData.pages}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="font-medium">Total Amount:</span>
+                    <span className="font-bold text-blue-600">₹{estimatedPrice}</span>
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="cardNumber">Card Number</Label>
+                  <Input id="cardNumber" placeholder="1234 5678 9012 3456" />
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="expiry">Expiry</Label>
+                    <Input id="expiry" placeholder="MM/YY" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="cvv">CVV</Label>
+                    <Input id="cvv" placeholder="123" />
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="cardName">Name on Card</Label>
+                  <Input id="cardName" placeholder="John Doe" />
+                </div>
+                
+                <div className="flex space-x-2">
+                  <Button 
+                    onClick={handlePayment} 
+                    className="flex-1" 
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? 'Processing...' : `Pay ₹${estimatedPrice}`}
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setShowPaymentGateway(false)}
+                    disabled={isSubmitting}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Order Form */}
@@ -379,8 +479,8 @@ const OrderFormContent = () => {
                     />
                   </div>
 
-                  <Button type="submit" className="w-full" disabled={isSubmitting}>
-                    {isSubmitting ? "Submitting Order..." : "Submit Order Request"}
+                  <Button type="submit" className="w-full">
+                    Proceed to Payment
                   </Button>
                 </form>
               </CardContent>
@@ -404,6 +504,18 @@ const OrderFormContent = () => {
                 
                 {estimatedPrice > 0 && (
                   <div className="space-y-3 p-4 bg-blue-50 rounded-lg">
+                    <div className="flex justify-between">
+                      <span className="font-medium">Selected Plan:</span>
+                      <span className="font-bold text-blue-600">{selectedPlan?.name || 'Standard'}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="font-medium">Price per Page:</span>
+                      <span className="font-bold">₹{selectedPlan?.pricePerPage || 50}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="font-medium">Pages:</span>
+                      <span className="font-bold">{formData.pages || 1}</span>
+                    </div>
                     <div className="flex justify-between">
                       <span className="font-medium">Estimated Price:</span>
                       <span className="font-bold text-blue-600">₹{estimatedPrice}</span>

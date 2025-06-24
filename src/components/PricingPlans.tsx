@@ -11,13 +11,14 @@ import { useNavigate } from "react-router-dom";
 interface PricingPlan {
   id: string;
   name: string;
-  price: number;
+  pricePerPage: number;
   originalPrice?: number;
   description: string;
   features: string[];
   popular?: boolean;
   icon: React.ReactNode;
   deliveryTime: string;
+  urgencyMultiplier: number;
 }
 
 const PricingPlans = () => {
@@ -30,9 +31,10 @@ const PricingPlans = () => {
     {
       id: 'basic',
       name: 'Basic',
-      price: 50,
+      pricePerPage: 50,
       description: 'Perfect for simple assignments and homework',
       deliveryTime: '3-7 days',
+      urgencyMultiplier: 1,
       icon: <CheckCircle className="h-6 w-6" />,
       features: [
         'Simple assignments',
@@ -45,10 +47,11 @@ const PricingPlans = () => {
     {
       id: 'standard',
       name: 'Standard',
-      price: 75,
+      pricePerPage: 75,
       originalPrice: 100,
       description: 'Most popular choice for complex assignments',
       deliveryTime: '1-3 days',
+      urgencyMultiplier: 1.5,
       popular: true,
       icon: <Zap className="h-6 w-6" />,
       features: [
@@ -64,9 +67,10 @@ const PricingPlans = () => {
     {
       id: 'premium',
       name: 'Premium',
-      price: 100,
+      pricePerPage: 100,
       description: 'For urgent and high-priority assignments',
       deliveryTime: '24 hours',
+      urgencyMultiplier: 2,
       icon: <Crown className="h-6 w-6" />,
       features: [
         'Urgent assignments',
@@ -95,20 +99,21 @@ const PricingPlans = () => {
     setLoadingPlan(plan.id);
 
     try {
-      // Simulate payment processing
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      toast({
-        title: "Plan Selected Successfully!",
-        description: `You've selected the ${plan.name} plan. Redirecting to order form...`,
-      });
-
-      // Navigate to order form with selected plan
+      // Navigate to order form with selected plan data
       navigate('/order', { 
         state: { 
-          selectedPlan: plan.name,
-          selectedPrice: plan.price 
+          selectedPlan: {
+            name: plan.name,
+            pricePerPage: plan.pricePerPage,
+            urgencyMultiplier: plan.urgencyMultiplier,
+            deliveryTime: plan.deliveryTime
+          }
         } 
+      });
+      
+      toast({
+        title: "Plan Selected!",
+        description: `You've selected the ${plan.name} plan. Please fill out the order details.`,
       });
     } catch (error) {
       toast({
@@ -150,7 +155,7 @@ const PricingPlans = () => {
                 <CardTitle className="text-xl">{plan.name}</CardTitle>
                 <div className="text-center">
                   <div className="flex items-center justify-center space-x-2">
-                    <span className="text-3xl font-bold">₹{plan.price}</span>
+                    <span className="text-3xl font-bold">₹{plan.pricePerPage}</span>
                     {plan.originalPrice && (
                       <span className="text-lg text-gray-500 line-through">₹{plan.originalPrice}</span>
                     )}
