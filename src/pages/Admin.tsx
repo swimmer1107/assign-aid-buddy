@@ -12,27 +12,27 @@ import { useToast } from '@/hooks/use-toast';
 import { Eye, Edit, DollarSign, Clock } from 'lucide-react';
 import { format } from 'date-fns';
 
-interface Order {
+interface OrderWithProfile {
   id: string;
   title: string;
   subject: string;
   assignment_type: string;
   status: string;
-  estimated_price: number;
-  estimated_time: string;
+  estimated_price: number | null;
+  estimated_time: string | null;
   deadline: string;
   created_at: string;
   user_id: string;
   profiles: {
-    first_name: string;
-    last_name: string;
-    email: string;
-  };
+    first_name: string | null;
+    last_name: string | null;
+    email: string | null;
+  } | null;
 }
 
 const Admin = () => {
   const { toast } = useToast();
-  const [orders, setOrders] = useState<Order[]>([]);
+  const [orders, setOrders] = useState<OrderWithProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingOrder, setEditingOrder] = useState<string | null>(null);
   const [editData, setEditData] = useState<{ status: string; price: string; time: string }>({
@@ -50,14 +50,33 @@ const Admin = () => {
       const { data, error } = await supabase
         .from('orders')
         .select(`
-          *,
-          profiles!inner(first_name, last_name, email)
+          id,
+          title,
+          subject,
+          assignment_type,
+          status,
+          estimated_price,
+          estimated_time,
+          deadline,
+          created_at,
+          user_id,
+          profiles!orders_user_id_fkey(
+            first_name,
+            last_name,
+            email
+          )
         `)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
+      
+      console.log('Fetched orders:', data);
       setOrders(data || []);
     } catch (error) {
+      console.error('Error fetching orders:', error);
       toast({
         title: "Error",
         description: "Failed to fetch orders",
@@ -97,7 +116,7 @@ const Admin = () => {
     }
   };
 
-  const startEditing = (order: Order) => {
+  const startEditing = (order: OrderWithProfile) => {
     setEditingOrder(order.id);
     setEditData({
       status: order.status,
@@ -205,9 +224,14 @@ const Admin = () => {
                     <TableCell>
                       <div>
                         <div className="font-medium">
-                          {order.profiles.first_name} {order.profiles.last_name}
+                          {order.profiles ? 
+                            `${order.profiles.first_name || ''} ${order.profiles.last_name || ''}`.trim() || 'Unknown User'
+                            : 'Unknown User'
+                          }
                         </div>
-                        <div className="text-sm text-gray-500">{order.profiles.email}</div>
+                        <div className="text-sm text-gray-500">
+                          {order.profiles?.email || 'No email'}
+                        </div>
                       </div>
                     </TableCell>
                     <TableCell>
