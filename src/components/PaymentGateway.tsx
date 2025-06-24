@@ -1,12 +1,11 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { CreditCard, QrCode, Smartphone } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 
 interface PaymentGatewayProps {
   totalAmount: number;
@@ -31,36 +30,22 @@ const PaymentGateway = ({
   formData,
   isSubmitting 
 }: PaymentGatewayProps) => {
-  const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>("");
+  // Hardcoded payment methods until database types are updated
+  const paymentMethods: PaymentMethod[] = [
+    { id: '1', method_name: 'UPI QR Code', method_type: 'qr' },
+    { id: '2', method_name: 'PhonePe', method_type: 'upi' },
+    { id: '3', method_name: 'Google Pay', method_type: 'upi' },
+    { id: '4', method_name: 'Paytm', method_type: 'upi' },
+    { id: '5', method_name: 'Credit/Debit Card', method_type: 'card' },
+  ];
+
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>("1"); // Default to UPI QR
   const [cardDetails, setCardDetails] = useState({
     cardNumber: "",
     expiry: "",
     cvv: "",
     cardName: ""
   });
-
-  useEffect(() => {
-    fetchPaymentMethods();
-  }, []);
-
-  const fetchPaymentMethods = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('payment_methods')
-        .select('*')
-        .eq('is_active', true)
-        .order('method_type', { ascending: true });
-
-      if (error) throw error;
-      setPaymentMethods(data || []);
-      if (data && data.length > 0) {
-        setSelectedPaymentMethod(data[0].id);
-      }
-    } catch (error) {
-      console.error('Error fetching payment methods:', error);
-    }
-  };
 
   const handlePayment = async () => {
     const selectedMethod = paymentMethods.find(m => m.id === selectedPaymentMethod);

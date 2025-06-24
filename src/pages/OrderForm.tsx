@@ -62,13 +62,13 @@ const OrderFormContent = () => {
       } else if (daysUntilDeadline <= 3) {
         urgencyMultiplier = 1.5;
       } else {
-        urgencyMultiplier = selectedPlan?.urgencyMultiplier || 1;
+        urgencyMultiplier = 1; // Normal pricing for more than 3 days
       }
     } else {
-      urgencyMultiplier = selectedPlan?.urgencyMultiplier || 1;
+      urgencyMultiplier = 1; // Default to normal pricing
     }
     
-    // Fix: Simple calculation without double multiplication
+    // Simple calculation: pages * basePrice * urgencyMultiplier
     const price = pages * basePrice * urgencyMultiplier;
     const timeInDays = selectedPlan?.deliveryTime || `${Math.max(1, Math.ceil(pages * 0.5))} day${Math.ceil(pages * 0.5) > 1 ? 's' : ''}`;
     
