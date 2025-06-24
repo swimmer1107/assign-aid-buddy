@@ -47,34 +47,35 @@ const Admin = () => {
 
   const fetchOrders = async () => {
     try {
-      const { data, error } = await supabase
+      // First get all orders
+      const { data: ordersData, error: ordersError } = await supabase
         .from('orders')
-        .select(`
-          id,
-          title,
-          subject,
-          assignment_type,
-          status,
-          estimated_price,
-          estimated_time,
-          deadline,
-          created_at,
-          user_id,
-          profiles!orders_user_id_fkey(
-            first_name,
-            last_name,
-            email
-          )
-        `)
+        .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) {
-        console.error('Supabase error:', error);
-        throw error;
+      if (ordersError) {
+        console.error('Orders query error:', ordersError);
+        throw ordersError;
       }
-      
-      console.log('Fetched orders:', data);
-      setOrders(data || []);
+
+      // Then get all profiles
+      const { data: profilesData, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, first_name, last_name, email');
+
+      if (profilesError) {
+        console.error('Profiles query error:', profilesError);
+        throw profilesError;
+      }
+
+      // Manually join the data
+      const ordersWithProfiles = ordersData?.map(order => ({
+        ...order,
+        profiles: profilesData?.find(profile => profile.id === order.user_id) || null
+      })) || [];
+
+      console.log('Fetched orders with profiles:', ordersWithProfiles);
+      setOrders(ordersWithProfiles);
     } catch (error) {
       console.error('Error fetching orders:', error);
       toast({
