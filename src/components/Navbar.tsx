@@ -3,7 +3,7 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { BookOpen, User, LayoutDashboard, Settings, LogIn, UserPlus } from 'lucide-react';
+import { BookOpen, User, LayoutDashboard, LogIn, UserPlus } from 'lucide-react';
 
 const Navbar = () => {
   const { user, signOut } = useAuth();
@@ -22,7 +22,7 @@ const Navbar = () => {
           <div className="flex items-center">
             <Link to="/" className="flex items-center space-x-2">
               <BookOpen className="h-8 w-8 text-blue-600" />
-              <span className="text-xl font-bold text-gray-900">AssignAid</span>
+              <span className="text-xl font-bold text-gray-900">AssignEase</span>
             </Link>
           </div>
 
@@ -55,6 +55,24 @@ const Navbar = () => {
                     size="sm"
                   >
                     Services
+                  </Button>
+                </Link>
+
+                <Link to="/about">
+                  <Button 
+                    variant={isActive('/about') ? 'default' : 'ghost'}
+                    size="sm"
+                  >
+                    About
+                  </Button>
+                </Link>
+
+                <Link to="/contact">
+                  <Button 
+                    variant={isActive('/contact') ? 'default' : 'ghost'}
+                    size="sm"
+                  >
+                    Contact
                   </Button>
                 </Link>
                 
@@ -90,6 +108,24 @@ const Navbar = () => {
                     size="sm"
                   >
                     Services
+                  </Button>
+                </Link>
+
+                <Link to="/about">
+                  <Button 
+                    variant={isActive('/about') ? 'default' : 'ghost'}
+                    size="sm"
+                  >
+                    About
+                  </Button>
+                </Link>
+
+                <Link to="/contact">
+                  <Button 
+                    variant={isActive('/contact') ? 'default' : 'ghost'}
+                    size="sm"
+                  >
+                    Contact
                   </Button>
                 </Link>
                 
