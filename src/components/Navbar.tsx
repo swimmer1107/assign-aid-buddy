@@ -3,7 +3,7 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { BookOpen, User, LayoutDashboard, LogIn, UserPlus, ShoppingBag, Upload } from 'lucide-react';
+import { BookOpen, User, LayoutDashboard, LogIn, UserPlus, ShoppingBag, Upload, Plus } from 'lucide-react';
 
 const Navbar = () => {
   const { user, signOut } = useAuth();
@@ -26,172 +26,190 @@ const Navbar = () => {
             </Link>
           </div>
 
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2">
             {user ? (
               <>
-                <Link to="/dashboard">
-                  <Button 
-                    variant={isActive('/dashboard') ? 'default' : 'ghost'}
-                    size="sm"
-                    className="flex items-center space-x-1"
-                  >
-                    <LayoutDashboard className="h-4 w-4" />
-                    <span>Dashboard</span>
-                  </Button>
-                </Link>
-                
-                <Link to="/order">
-                  <Button 
-                    variant={isActive('/order') ? 'default' : 'ghost'}
-                    size="sm"
-                  >
-                    New Order
-                  </Button>
-                </Link>
+                {/* Main Actions */}
+                <div className="flex items-center space-x-1 border-r pr-3">
+                  <Link to="/dashboard">
+                    <Button 
+                      variant={isActive('/dashboard') ? 'default' : 'ghost'}
+                      size="sm"
+                      className="flex items-center space-x-1"
+                    >
+                      <LayoutDashboard className="h-4 w-4" />
+                      <span>Dashboard</span>
+                    </Button>
+                  </Link>
+                  
+                  <Link to="/order">
+                    <Button 
+                      variant={isActive('/order') ? 'default' : 'ghost'}
+                      size="sm"
+                      className="flex items-center space-x-1"
+                    >
+                      <Plus className="h-4 w-4" />
+                      <span>Order</span>
+                    </Button>
+                  </Link>
+                </div>
 
-                <Link to="/notes">
-                  <Button 
-                    variant={isActive('/notes') ? 'default' : 'ghost'}
-                    size="sm"
-                    className="flex items-center space-x-1"
-                  >
-                    <ShoppingBag className="h-4 w-4" />
-                    <span>Notes</span>
-                  </Button>
-                </Link>
+                {/* Notes Section */}
+                <div className="flex items-center space-x-1 border-r pr-3">
+                  <Link to="/notes">
+                    <Button 
+                      variant={isActive('/notes') ? 'default' : 'ghost'}
+                      size="sm"
+                      className="flex items-center space-x-1"
+                    >
+                      <ShoppingBag className="h-4 w-4" />
+                      <span>Browse</span>
+                    </Button>
+                  </Link>
 
-                <Link to="/sell-notes">
-                  <Button 
-                    variant={isActive('/sell-notes') ? 'default' : 'ghost'}
-                    size="sm"
-                    className="flex items-center space-x-1"
-                  >
-                    <Upload className="h-4 w-4" />
-                    <span>Sell Notes</span>
-                  </Button>
-                </Link>
+                  <Link to="/sell-notes">
+                    <Button 
+                      variant={isActive('/sell-notes') ? 'default' : 'ghost'}
+                      size="sm"
+                      className="flex items-center space-x-1"
+                    >
+                      <Upload className="h-4 w-4" />
+                      <span>Sell</span>
+                    </Button>
+                  </Link>
 
-                <Link to="/my-notes">
-                  <Button 
-                    variant={isActive('/my-notes') ? 'default' : 'ghost'}
-                    size="sm"
-                  >
-                    My Notes
-                  </Button>
-                </Link>
-                
-                <Link to="/services">
-                  <Button 
-                    variant={isActive('/services') ? 'default' : 'ghost'}
-                    size="sm"
-                  >
-                    Services
-                  </Button>
-                </Link>
+                  <Link to="/my-notes">
+                    <Button 
+                      variant={isActive('/my-notes') ? 'default' : 'ghost'}
+                      size="sm"
+                    >
+                      My Notes
+                    </Button>
+                  </Link>
+                </div>
 
-                <Link to="/about">
-                  <Button 
-                    variant={isActive('/about') ? 'default' : 'ghost'}
-                    size="sm"
-                  >
-                    About
-                  </Button>
-                </Link>
+                {/* Info Pages */}
+                <div className="flex items-center space-x-1 border-r pr-3">
+                  <Link to="/services">
+                    <Button 
+                      variant={isActive('/services') ? 'default' : 'ghost'}
+                      size="sm"
+                    >
+                      Services
+                    </Button>
+                  </Link>
 
-                <Link to="/contact">
-                  <Button 
-                    variant={isActive('/contact') ? 'default' : 'ghost'}
-                    size="sm"
-                  >
-                    Contact
+                  <Link to="/about">
+                    <Button 
+                      variant={isActive('/about') ? 'default' : 'ghost'}
+                      size="sm"
+                    >
+                      About
+                    </Button>
+                  </Link>
+
+                  <Link to="/contact">
+                    <Button 
+                      variant={isActive('/contact') ? 'default' : 'ghost'}
+                      size="sm"
+                    >
+                      Contact
+                    </Button>
+                  </Link>
+                </div>
+
+                {/* User Actions */}
+                <div className="flex items-center space-x-1">
+                  <Link to="/admin">
+                    <Button 
+                      variant={isActive('/admin') ? 'default' : 'ghost'}
+                      size="sm"
+                    >
+                      Admin
+                    </Button>
+                  </Link>
+                  
+                  <Link to="/profile">
+                    <Button 
+                      variant={isActive('/profile') ? 'default' : 'ghost'}
+                      size="sm"
+                      className="flex items-center space-x-1"
+                    >
+                      <User className="h-4 w-4" />
+                      <span>Profile</span>
+                    </Button>
+                  </Link>
+                  
+                  <Button onClick={handleSignOut} variant="outline" size="sm">
+                    Sign Out
                   </Button>
-                </Link>
-                
-                <Link to="/admin">
-                  <Button 
-                    variant={isActive('/admin') ? 'default' : 'ghost'}
-                    size="sm"
-                  >
-                    Admin
-                  </Button>
-                </Link>
-                
-                <Link to="/profile">
-                  <Button 
-                    variant={isActive('/profile') ? 'default' : 'ghost'}
-                    size="sm"
-                    className="flex items-center space-x-1"
-                  >
-                    <User className="h-4 w-4" />
-                    <span>Profile</span>
-                  </Button>
-                </Link>
-                
-                <Button onClick={handleSignOut} variant="outline" size="sm">
-                  Sign Out
-                </Button>
+                </div>
               </>
             ) : (
               <>
-                <Link to="/notes">
-                  <Button 
-                    variant={isActive('/notes') ? 'default' : 'ghost'}
-                    size="sm"
-                    className="flex items-center space-x-1"
-                  >
-                    <ShoppingBag className="h-4 w-4" />
-                    <span>Notes</span>
-                  </Button>
-                </Link>
+                <div className="flex items-center space-x-1 border-r pr-3">
+                  <Link to="/notes">
+                    <Button 
+                      variant={isActive('/notes') ? 'default' : 'ghost'}
+                      size="sm"
+                      className="flex items-center space-x-1"
+                    >
+                      <ShoppingBag className="h-4 w-4" />
+                      <span>Notes</span>
+                    </Button>
+                  </Link>
 
-                <Link to="/services">
-                  <Button 
-                    variant={isActive('/services') ? 'default' : 'ghost'}
-                    size="sm"
-                  >
-                    Services
-                  </Button>
-                </Link>
+                  <Link to="/services">
+                    <Button 
+                      variant={isActive('/services') ? 'default' : 'ghost'}
+                      size="sm"
+                    >
+                      Services
+                    </Button>
+                  </Link>
 
-                <Link to="/about">
-                  <Button 
-                    variant={isActive('/about') ? 'default' : 'ghost'}
-                    size="sm"
-                  >
-                    About
-                  </Button>
-                </Link>
+                  <Link to="/about">
+                    <Button 
+                      variant={isActive('/about') ? 'default' : 'ghost'}
+                      size="sm"
+                    >
+                      About
+                    </Button>
+                  </Link>
 
-                <Link to="/contact">
-                  <Button 
-                    variant={isActive('/contact') ? 'default' : 'ghost'}
-                    size="sm"
-                  >
-                    Contact
-                  </Button>
-                </Link>
+                  <Link to="/contact">
+                    <Button 
+                      variant={isActive('/contact') ? 'default' : 'ghost'}
+                      size="sm"
+                    >
+                      Contact
+                    </Button>
+                  </Link>
+                </div>
                 
-                <Link to="/login">
-                  <Button 
-                    variant={isActive('/login') ? 'default' : 'ghost'}
-                    size="sm"
-                    className="flex items-center space-x-1"
-                  >
-                    <LogIn className="h-4 w-4" />
-                    <span>Login</span>
-                  </Button>
-                </Link>
-                
-                <Link to="/signup">
-                  <Button 
-                    variant={isActive('/signup') ? 'default' : 'outline'}
-                    size="sm"
-                    className="flex items-center space-x-1"
-                  >
-                    <UserPlus className="h-4 w-4" />
-                    <span>Sign Up</span>
-                  </Button>
-                </Link>
+                <div className="flex items-center space-x-1">
+                  <Link to="/login">
+                    <Button 
+                      variant={isActive('/login') ? 'default' : 'ghost'}
+                      size="sm"
+                      className="flex items-center space-x-1"
+                    >
+                      <LogIn className="h-4 w-4" />
+                      <span>Login</span>
+                    </Button>
+                  </Link>
+                  
+                  <Link to="/signup">
+                    <Button 
+                      variant={isActive('/signup') ? 'default' : 'outline'}
+                      size="sm"
+                      className="flex items-center space-x-1"
+                    >
+                      <UserPlus className="h-4 w-4" />
+                      <span>Sign Up</span>
+                    </Button>
+                  </Link>
+                </div>
               </>
             )}
           </div>
