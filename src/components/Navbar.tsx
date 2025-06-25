@@ -3,7 +3,16 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { BookOpen, User, LayoutDashboard, LogIn, UserPlus, ShoppingBag, Upload, Plus } from 'lucide-react';
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from '@/components/ui/navigation-menu';
+import { BookOpen, User, LayoutDashboard, LogIn, UserPlus, ShoppingBag, Upload, Plus, Settings, Info, Phone } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 const Navbar = () => {
   const { user, signOut } = useAuth();
@@ -26,100 +35,231 @@ const Navbar = () => {
             </Link>
           </div>
 
-          <div className="flex items-center space-x-2">
-            {user ? (
-              <>
-                {/* Main Actions */}
-                <div className="flex items-center space-x-1 border-r pr-3">
-                  <Link to="/dashboard">
-                    <Button 
-                      variant={isActive('/dashboard') ? 'default' : 'ghost'}
-                      size="sm"
-                      className="flex items-center space-x-1"
-                    >
-                      <LayoutDashboard className="h-4 w-4" />
-                      <span>Dashboard</span>
-                    </Button>
-                  </Link>
-                  
-                  <Link to="/order">
-                    <Button 
-                      variant={isActive('/order') ? 'default' : 'ghost'}
-                      size="sm"
-                      className="flex items-center space-x-1"
-                    >
-                      <Plus className="h-4 w-4" />
-                      <span>Order</span>
-                    </Button>
-                  </Link>
-                </div>
+          <div className="flex items-center space-x-4">
+            <NavigationMenu>
+              <NavigationMenuList>
+                {user ? (
+                  <>
+                    {/* Main Actions */}
+                    <NavigationMenuItem>
+                      <NavigationMenuTrigger className="h-9">
+                        <LayoutDashboard className="h-4 w-4 mr-1" />
+                        Dashboard
+                      </NavigationMenuTrigger>
+                      <NavigationMenuContent>
+                        <div className="grid w-[300px] gap-3 p-4">
+                          <NavigationMenuLink asChild>
+                            <Link
+                              to="/dashboard"
+                              className={cn(
+                                "flex items-center space-x-2 rounded-md p-3 text-sm leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+                                isActive('/dashboard') && "bg-accent"
+                              )}
+                            >
+                              <LayoutDashboard className="h-4 w-4" />
+                              <div>
+                                <div className="font-medium">Dashboard</div>
+                                <p className="text-sm text-muted-foreground">View your overview and stats</p>
+                              </div>
+                            </Link>
+                          </NavigationMenuLink>
+                          <NavigationMenuLink asChild>
+                            <Link
+                              to="/order"
+                              className={cn(
+                                "flex items-center space-x-2 rounded-md p-3 text-sm leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+                                isActive('/order') && "bg-accent"
+                              )}
+                            >
+                              <Plus className="h-4 w-4" />
+                              <div>
+                                <div className="font-medium">Create Order</div>
+                                <p className="text-sm text-muted-foreground">Place a new assignment order</p>
+                              </div>
+                            </Link>
+                          </NavigationMenuLink>
+                        </div>
+                      </NavigationMenuContent>
+                    </NavigationMenuItem>
 
-                {/* Notes Section */}
-                <div className="flex items-center space-x-1 border-r pr-3">
-                  <Link to="/notes">
-                    <Button 
-                      variant={isActive('/notes') ? 'default' : 'ghost'}
-                      size="sm"
-                      className="flex items-center space-x-1"
-                    >
-                      <ShoppingBag className="h-4 w-4" />
-                      <span>Browse</span>
-                    </Button>
-                  </Link>
+                    {/* Notes Section */}
+                    <NavigationMenuItem>
+                      <NavigationMenuTrigger className="h-9">
+                        <ShoppingBag className="h-4 w-4 mr-1" />
+                        Notes
+                      </NavigationMenuTrigger>
+                      <NavigationMenuContent>
+                        <div className="grid w-[300px] gap-3 p-4">
+                          <NavigationMenuLink asChild>
+                            <Link
+                              to="/notes"
+                              className={cn(
+                                "flex items-center space-x-2 rounded-md p-3 text-sm leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+                                isActive('/notes') && "bg-accent"
+                              )}
+                            >
+                              <ShoppingBag className="h-4 w-4" />
+                              <div>
+                                <div className="font-medium">Browse Notes</div>
+                                <p className="text-sm text-muted-foreground">Find and purchase study notes</p>
+                              </div>
+                            </Link>
+                          </NavigationMenuLink>
+                          <NavigationMenuLink asChild>
+                            <Link
+                              to="/sell-notes"
+                              className={cn(
+                                "flex items-center space-x-2 rounded-md p-3 text-sm leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+                                isActive('/sell-notes') && "bg-accent"
+                              )}
+                            >
+                              <Upload className="h-4 w-4" />
+                              <div>
+                                <div className="font-medium">Sell Notes</div>
+                                <p className="text-sm text-muted-foreground">Upload and sell your notes</p>
+                              </div>
+                            </Link>
+                          </NavigationMenuLink>
+                          <NavigationMenuLink asChild>
+                            <Link
+                              to="/my-notes"
+                              className={cn(
+                                "flex items-center space-x-2 rounded-md p-3 text-sm leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+                                isActive('/my-notes') && "bg-accent"
+                              )}
+                            >
+                              <BookOpen className="h-4 w-4" />
+                              <div>
+                                <div className="font-medium">My Notes</div>
+                                <p className="text-sm text-muted-foreground">Manage your purchased notes</p>
+                              </div>
+                            </Link>
+                          </NavigationMenuLink>
+                        </div>
+                      </NavigationMenuContent>
+                    </NavigationMenuItem>
 
-                  <Link to="/sell-notes">
-                    <Button 
-                      variant={isActive('/sell-notes') ? 'default' : 'ghost'}
-                      size="sm"
-                      className="flex items-center space-x-1"
-                    >
-                      <Upload className="h-4 w-4" />
-                      <span>Sell</span>
-                    </Button>
-                  </Link>
+                    {/* Info Pages */}
+                    <NavigationMenuItem>
+                      <NavigationMenuTrigger className="h-9">
+                        <Info className="h-4 w-4 mr-1" />
+                        Info
+                      </NavigationMenuTrigger>
+                      <NavigationMenuContent>
+                        <div className="grid w-[250px] gap-3 p-4">
+                          <NavigationMenuLink asChild>
+                            <Link
+                              to="/services"
+                              className={cn(
+                                "flex items-center space-x-2 rounded-md p-3 text-sm leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+                                isActive('/services') && "bg-accent"
+                              )}
+                            >
+                              <Settings className="h-4 w-4" />
+                              <div className="font-medium">Services</div>
+                            </Link>
+                          </NavigationMenuLink>
+                          <NavigationMenuLink asChild>
+                            <Link
+                              to="/about"
+                              className={cn(
+                                "flex items-center space-x-2 rounded-md p-3 text-sm leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+                                isActive('/about') && "bg-accent"
+                              )}
+                            >
+                              <Info className="h-4 w-4" />
+                              <div className="font-medium">About</div>
+                            </Link>
+                          </NavigationMenuLink>
+                          <NavigationMenuLink asChild>
+                            <Link
+                              to="/contact"
+                              className={cn(
+                                "flex items-center space-x-2 rounded-md p-3 text-sm leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+                                isActive('/contact') && "bg-accent"
+                              )}
+                            >
+                              <Phone className="h-4 w-4" />
+                              <div className="font-medium">Contact</div>
+                            </Link>
+                          </NavigationMenuLink>
+                        </div>
+                      </NavigationMenuContent>
+                    </NavigationMenuItem>
+                  </>
+                ) : (
+                  <>
+                    {/* Public Navigation */}
+                    <NavigationMenuItem>
+                      <NavigationMenuLink asChild>
+                        <Link
+                          to="/notes"
+                          className={cn(
+                            "group inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50",
+                            isActive('/notes') && "bg-accent"
+                          )}
+                        >
+                          <ShoppingBag className="h-4 w-4 mr-1" />
+                          Notes
+                        </Link>
+                      </NavigationMenuLink>
+                    </NavigationMenuItem>
 
-                  <Link to="/my-notes">
-                    <Button 
-                      variant={isActive('/my-notes') ? 'default' : 'ghost'}
-                      size="sm"
-                    >
-                      My Notes
-                    </Button>
-                  </Link>
-                </div>
+                    <NavigationMenuItem>
+                      <NavigationMenuTrigger className="h-9">
+                        <Info className="h-4 w-4 mr-1" />
+                        Info
+                      </NavigationMenuTrigger>
+                      <NavigationMenuContent>
+                        <div className="grid w-[200px] gap-3 p-4">
+                          <NavigationMenuLink asChild>
+                            <Link
+                              to="/services"
+                              className={cn(
+                                "flex items-center space-x-2 rounded-md p-3 text-sm leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+                                isActive('/services') && "bg-accent"
+                              )}
+                            >
+                              <Settings className="h-4 w-4" />
+                              <div className="font-medium">Services</div>
+                            </Link>
+                          </NavigationMenuLink>
+                          <NavigationMenuLink asChild>
+                            <Link
+                              to="/about"
+                              className={cn(
+                                "flex items-center space-x-2 rounded-md p-3 text-sm leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+                                isActive('/about') && "bg-accent"
+                              )}
+                            >
+                              <Info className="h-4 w-4" />
+                              <div className="font-medium">About</div>
+                            </Link>
+                          </NavigationMenuLink>
+                          <NavigationMenuLink asChild>
+                            <Link
+                              to="/contact"
+                              className={cn(
+                                "flex items-center space-x-2 rounded-md p-3 text-sm leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+                                isActive('/contact') && "bg-accent"
+                              )}
+                            >
+                              <Phone className="h-4 w-4" />
+                              <div className="font-medium">Contact</div>
+                            </Link>
+                          </NavigationMenuLink>
+                        </div>
+                      </NavigationMenuContent>
+                    </NavigationMenuItem>
+                  </>
+                )}
+              </NavigationMenuList>
+            </NavigationMenu>
 
-                {/* Info Pages */}
-                <div className="flex items-center space-x-1 border-r pr-3">
-                  <Link to="/services">
-                    <Button 
-                      variant={isActive('/services') ? 'default' : 'ghost'}
-                      size="sm"
-                    >
-                      Services
-                    </Button>
-                  </Link>
-
-                  <Link to="/about">
-                    <Button 
-                      variant={isActive('/about') ? 'default' : 'ghost'}
-                      size="sm"
-                    >
-                      About
-                    </Button>
-                  </Link>
-
-                  <Link to="/contact">
-                    <Button 
-                      variant={isActive('/contact') ? 'default' : 'ghost'}
-                      size="sm"
-                    >
-                      Contact
-                    </Button>
-                  </Link>
-                </div>
-
-                {/* User Actions */}
-                <div className="flex items-center space-x-1">
+            {/* User Actions */}
+            <div className="flex items-center space-x-2 border-l pl-4">
+              {user ? (
+                <>
                   <Link to="/admin">
                     <Button 
                       variant={isActive('/admin') ? 'default' : 'ghost'}
@@ -143,51 +283,9 @@ const Navbar = () => {
                   <Button onClick={handleSignOut} variant="outline" size="sm">
                     Sign Out
                   </Button>
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="flex items-center space-x-1 border-r pr-3">
-                  <Link to="/notes">
-                    <Button 
-                      variant={isActive('/notes') ? 'default' : 'ghost'}
-                      size="sm"
-                      className="flex items-center space-x-1"
-                    >
-                      <ShoppingBag className="h-4 w-4" />
-                      <span>Notes</span>
-                    </Button>
-                  </Link>
-
-                  <Link to="/services">
-                    <Button 
-                      variant={isActive('/services') ? 'default' : 'ghost'}
-                      size="sm"
-                    >
-                      Services
-                    </Button>
-                  </Link>
-
-                  <Link to="/about">
-                    <Button 
-                      variant={isActive('/about') ? 'default' : 'ghost'}
-                      size="sm"
-                    >
-                      About
-                    </Button>
-                  </Link>
-
-                  <Link to="/contact">
-                    <Button 
-                      variant={isActive('/contact') ? 'default' : 'ghost'}
-                      size="sm"
-                    >
-                      Contact
-                    </Button>
-                  </Link>
-                </div>
-                
-                <div className="flex items-center space-x-1">
+                </>
+              ) : (
+                <>
                   <Link to="/login">
                     <Button 
                       variant={isActive('/login') ? 'default' : 'ghost'}
@@ -209,9 +307,9 @@ const Navbar = () => {
                       <span>Sign Up</span>
                     </Button>
                   </Link>
-                </div>
-              </>
-            )}
+                </>
+              )}
+            </div>
           </div>
         </div>
       </div>
