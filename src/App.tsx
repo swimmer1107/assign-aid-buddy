@@ -16,6 +16,9 @@ import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
+import NotesMarketplace from "./pages/NotesMarketplace";
+import SellNotes from "./pages/SellNotes";
+import MyNotes from "./pages/MyNotes";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
@@ -34,6 +37,7 @@ const App = () => (
             <Route path="/services" element={<Services />} />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/notes" element={<NotesMarketplace />} />
             <Route path="/order" element={
               <ProtectedRoute>
                 <OrderForm />
@@ -47,6 +51,16 @@ const App = () => (
             <Route path="/profile" element={
               <ProtectedRoute>
                 <Profile />
+              </ProtectedRoute>
+            } />
+            <Route path="/sell-notes" element={
+              <ProtectedRoute>
+                <SellNotes />
+              </ProtectedRoute>
+            } />
+            <Route path="/my-notes" element={
+              <ProtectedRoute>
+                <MyNotes />
               </ProtectedRoute>
             } />
             <Route path="/admin" element={

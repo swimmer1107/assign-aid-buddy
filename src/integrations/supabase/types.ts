@@ -9,6 +9,196 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      note_purchases: {
+        Row: {
+          buyer_id: string
+          id: string
+          note_id: string
+          payment_method_id: string | null
+          payment_status: string | null
+          purchase_price: number
+          purchased_at: string
+          transaction_id: string | null
+        }
+        Insert: {
+          buyer_id: string
+          id?: string
+          note_id: string
+          payment_method_id?: string | null
+          payment_status?: string | null
+          purchase_price: number
+          purchased_at?: string
+          transaction_id?: string | null
+        }
+        Update: {
+          buyer_id?: string
+          id?: string
+          note_id?: string
+          payment_method_id?: string | null
+          payment_status?: string | null
+          purchase_price?: number
+          purchased_at?: string
+          transaction_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "note_purchases_note_id_fkey"
+            columns: ["note_id"]
+            isOneToOne: false
+            referencedRelation: "notes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      note_reviews: {
+        Row: {
+          created_at: string
+          id: string
+          note_id: string
+          purchase_id: string
+          rating: number
+          review_text: string | null
+          reviewer_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          note_id: string
+          purchase_id: string
+          rating: number
+          review_text?: string | null
+          reviewer_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          note_id?: string
+          purchase_id?: string
+          rating?: number
+          review_text?: string | null
+          reviewer_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "note_reviews_note_id_fkey"
+            columns: ["note_id"]
+            isOneToOne: false
+            referencedRelation: "notes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "note_reviews_purchase_id_fkey"
+            columns: ["purchase_id"]
+            isOneToOne: false
+            referencedRelation: "note_purchases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      note_tags: {
+        Row: {
+          created_at: string
+          id: string
+          note_id: string
+          tag_name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          note_id: string
+          tag_name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          note_id?: string
+          tag_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "note_tags_note_id_fkey"
+            columns: ["note_id"]
+            isOneToOne: false
+            referencedRelation: "notes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notes: {
+        Row: {
+          content_type: string
+          course_code: string | null
+          created_at: string
+          description: string | null
+          downloads_count: number | null
+          file_path: string
+          file_size: number | null
+          id: string
+          preview_available: boolean | null
+          preview_file_path: string | null
+          price: number
+          professor_name: string | null
+          rating: number | null
+          reviews_count: number | null
+          seller_id: string
+          semester: string | null
+          status: string | null
+          subject: string
+          title: string
+          university: string
+          updated_at: string
+          year: number | null
+        }
+        Insert: {
+          content_type: string
+          course_code?: string | null
+          created_at?: string
+          description?: string | null
+          downloads_count?: number | null
+          file_path: string
+          file_size?: number | null
+          id?: string
+          preview_available?: boolean | null
+          preview_file_path?: string | null
+          price: number
+          professor_name?: string | null
+          rating?: number | null
+          reviews_count?: number | null
+          seller_id: string
+          semester?: string | null
+          status?: string | null
+          subject: string
+          title: string
+          university: string
+          updated_at?: string
+          year?: number | null
+        }
+        Update: {
+          content_type?: string
+          course_code?: string | null
+          created_at?: string
+          description?: string | null
+          downloads_count?: number | null
+          file_path?: string
+          file_size?: number | null
+          id?: string
+          preview_available?: boolean | null
+          preview_file_path?: string | null
+          price?: number
+          professor_name?: string | null
+          rating?: number | null
+          reviews_count?: number | null
+          seller_id?: string
+          semester?: string | null
+          status?: string | null
+          subject?: string
+          title?: string
+          university?: string
+          updated_at?: string
+          year?: number | null
+        }
+        Relationships: []
+      }
       order_files: {
         Row: {
           created_at: string

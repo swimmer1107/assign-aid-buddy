@@ -3,7 +3,7 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { BookOpen, User, LayoutDashboard, LogIn, UserPlus } from 'lucide-react';
+import { BookOpen, User, LayoutDashboard, LogIn, UserPlus, ShoppingBag, Upload } from 'lucide-react';
 
 const Navbar = () => {
   const { user, signOut } = useAuth();
@@ -46,6 +46,37 @@ const Navbar = () => {
                     size="sm"
                   >
                     New Order
+                  </Button>
+                </Link>
+
+                <Link to="/notes">
+                  <Button 
+                    variant={isActive('/notes') ? 'default' : 'ghost'}
+                    size="sm"
+                    className="flex items-center space-x-1"
+                  >
+                    <ShoppingBag className="h-4 w-4" />
+                    <span>Notes</span>
+                  </Button>
+                </Link>
+
+                <Link to="/sell-notes">
+                  <Button 
+                    variant={isActive('/sell-notes') ? 'default' : 'ghost'}
+                    size="sm"
+                    className="flex items-center space-x-1"
+                  >
+                    <Upload className="h-4 w-4" />
+                    <span>Sell Notes</span>
+                  </Button>
+                </Link>
+
+                <Link to="/my-notes">
+                  <Button 
+                    variant={isActive('/my-notes') ? 'default' : 'ghost'}
+                    size="sm"
+                  >
+                    My Notes
                   </Button>
                 </Link>
                 
@@ -102,6 +133,17 @@ const Navbar = () => {
               </>
             ) : (
               <>
+                <Link to="/notes">
+                  <Button 
+                    variant={isActive('/notes') ? 'default' : 'ghost'}
+                    size="sm"
+                    className="flex items-center space-x-1"
+                  >
+                    <ShoppingBag className="h-4 w-4" />
+                    <span>Notes</span>
+                  </Button>
+                </Link>
+
                 <Link to="/services">
                   <Button 
                     variant={isActive('/services') ? 'default' : 'ghost'}
