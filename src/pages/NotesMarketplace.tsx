@@ -36,9 +36,9 @@ const NotesMarketplace = () => {
   const [notes, setNotes] = useState<Note[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedUniversity, setSelectedUniversity] = useState('');
-  const [selectedSubject, setSelectedSubject] = useState('');
-  const [priceRange, setPriceRange] = useState('');
+  const [selectedUniversity, setSelectedUniversity] = useState('all');
+  const [selectedSubject, setSelectedSubject] = useState('all');
+  const [priceRange, setPriceRange] = useState('all');
   const [universities, setUniversities] = useState<string[]>([]);
   const [subjects, setSubjects] = useState<string[]>([]);
 
@@ -59,15 +59,15 @@ const NotesMarketplace = () => {
         query = query.or(`title.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%,subject.ilike.%${searchTerm}%`);
       }
 
-      if (selectedUniversity) {
+      if (selectedUniversity && selectedUniversity !== 'all') {
         query = query.eq('university', selectedUniversity);
       }
 
-      if (selectedSubject) {
+      if (selectedSubject && selectedSubject !== 'all') {
         query = query.eq('subject', selectedSubject);
       }
 
-      if (priceRange) {
+      if (priceRange && priceRange !== 'all') {
         const [min, max] = priceRange.split('-').map(Number);
         if (max) {
           query = query.gte('price', min).lte('price', max);
@@ -180,7 +180,7 @@ const NotesMarketplace = () => {
                 <SelectValue placeholder="University" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Universities</SelectItem>
+                <SelectItem value="all">All Universities</SelectItem>
                 {universities.map(university => (
                   <SelectItem key={university} value={university}>{university}</SelectItem>
                 ))}
@@ -192,7 +192,7 @@ const NotesMarketplace = () => {
                 <SelectValue placeholder="Subject" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Subjects</SelectItem>
+                <SelectItem value="all">All Subjects</SelectItem>
                 {subjects.map(subject => (
                   <SelectItem key={subject} value={subject}>{subject}</SelectItem>
                 ))}
@@ -204,7 +204,7 @@ const NotesMarketplace = () => {
                 <SelectValue placeholder="Price Range" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Any Price</SelectItem>
+                <SelectItem value="all">Any Price</SelectItem>
                 <SelectItem value="0-50">₹0 - ₹50</SelectItem>
                 <SelectItem value="50-100">₹50 - ₹100</SelectItem>
                 <SelectItem value="100-200">₹100 - ₹200</SelectItem>
