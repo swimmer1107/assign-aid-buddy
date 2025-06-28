@@ -249,10 +249,14 @@ export type Database = {
           grade: string
           id: string
           pages: number
+          payment_amount: number | null
+          payment_method_id: string | null
+          payment_status: string | null
           special_instructions: string | null
           status: string
           subject: string
           title: string
+          transaction_id: string | null
           updated_at: string
           user_id: string
         }
@@ -267,10 +271,14 @@ export type Database = {
           grade: string
           id?: string
           pages: number
+          payment_amount?: number | null
+          payment_method_id?: string | null
+          payment_status?: string | null
           special_instructions?: string | null
           status?: string
           subject: string
           title: string
+          transaction_id?: string | null
           updated_at?: string
           user_id: string
         }
@@ -285,10 +293,14 @@ export type Database = {
           grade?: string
           id?: string
           pages?: number
+          payment_amount?: number | null
+          payment_method_id?: string | null
+          payment_status?: string | null
           special_instructions?: string | null
           status?: string
           subject?: string
           title?: string
+          transaction_id?: string | null
           updated_at?: string
           user_id?: string
         }
