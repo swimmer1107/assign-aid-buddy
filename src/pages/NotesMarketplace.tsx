@@ -255,8 +255,14 @@ const NotesMarketplace = () => {
 
       if (error) throw error;
 
-      // Update download count
-      await supabase.rpc('increment_downloads', { note_id: noteId });
+      // Update download count using the database function
+      const { error: incrementError } = await supabase.rpc('increment_downloads', { 
+        note_id: noteId 
+      });
+
+      if (incrementError) {
+        console.error('Error incrementing downloads:', incrementError);
+      }
 
       toast({
         title: "Purchase Successful! 🎉",
