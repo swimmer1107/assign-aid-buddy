@@ -82,7 +82,7 @@ const Navbar = () => {
                       </NavigationMenuContent>
                     </NavigationMenuItem>
 
-                    {/* Notes Section */}
+                    {/* Notes Section - Only visible to authenticated users */}
                     <NavigationMenuItem>
                       <NavigationMenuTrigger className="h-9">
                         <ShoppingBag className="h-4 w-4 mr-1" />
@@ -189,22 +189,7 @@ const Navbar = () => {
                   </>
                 ) : (
                   <>
-                    {/* Public Navigation */}
-                    <NavigationMenuItem>
-                      <NavigationMenuLink asChild>
-                        <Link
-                          to="/notes"
-                          className={cn(
-                            "group inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50",
-                            isActive('/notes') && "bg-accent"
-                          )}
-                        >
-                          <ShoppingBag className="h-4 w-4 mr-1" />
-                          Notes
-                        </Link>
-                      </NavigationMenuLink>
-                    </NavigationMenuItem>
-
+                    {/* Public Navigation - No Notes access for non-authenticated users */}
                     <NavigationMenuItem>
                       <NavigationMenuTrigger className="h-9">
                         <Info className="h-4 w-4 mr-1" />
